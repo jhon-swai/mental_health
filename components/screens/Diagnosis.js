@@ -47,7 +47,7 @@ export default function Diagnosis(){
     
     // setting depressed 
     const setSleep = (value) => {
-        setReply( { ...reply, ["down_depressed"]: value })
+        setReply( { ...reply, ["sleep_trouble"]: value })
     }
     
     
@@ -86,6 +86,8 @@ export default function Diagnosis(){
                     <Button mode='text' onPress={ () => setSleep(2) }>c) {answer_options[2]}</Button>
                     <Button mode='text' onPress={ () => setSleep(3) } >d) {answer_options[3]}</Button>
             </View>
+
+
 
 
 
