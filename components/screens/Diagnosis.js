@@ -1,9 +1,11 @@
+import axios from 'axios';
 import React, { useState } from 'react'
 import { render } from 'react-dom';
 import { View, StyleSheet , Text, Dimensions} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Button, Title } from 'react-native-paper';
+import { Button, Title, Snackbar } from 'react-native-paper';
 
+const apiUrl = 'http://example.com'
 const { width, height } = Dimensions.get('screen')
 
 const questions = [
@@ -50,8 +52,19 @@ export default function Diagnosis(){
     
     const setValue = (qn_code, value) =>{
         setReply({ ...reply, [questions_code[qn_code]]: value})
-
+        increment
         console.log(reply)
+    }
+
+    const submitData = () => {
+        if (count > 7) {
+            axios.post(apiUrl,data= reply)
+            .then(function(response){ console.log(response) })
+            .catch(function(error){ console.log(error)})
+        }
+        else { 
+            
+        }
     }
 
     return (
@@ -147,10 +160,12 @@ export default function Diagnosis(){
                     <Button mode='text' onPress={ () => setValue(8, 1) } >b) {answer_options[1]}</Button>
                     <Button mode='text' onPress={ () => setValue(8, 2) }>c) {answer_options[2]}</Button>
                     <Button mode='text' onPress={ () => setValue(8, 3) } >d) {answer_options[3]}</Button>
-            </View>            
+            </View> 
+                       
         </View>
         
-        <Button mode='contained' onPress=""> Submit</Button>
+        
+        <Button mode='contained' onPress={submitData}> Submit</Button>
         </ScrollView>
         
     )
@@ -166,16 +181,17 @@ const styles = StyleSheet.create({
       backgroundColor: "ccc",
       marginLeft: 10,
       marginRight: 10,
-      color: '#292a30'
+      color: '#292a30',
     },
+    
     titleText: {
         marginBottom: 15,
         alignContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     questionsContainer:{
         alignItems: "flex-start",
-        color: '#292a30'
+        color: '#292a30',
     },
     button: {
         marginLeft: 10,
@@ -190,6 +206,7 @@ const styles = StyleSheet.create({
     },
     questions: {
         fontSize: 22,
-        marginBottom: 10 
+        marginBottom: 10 ,
+        fontFamily: 'Cochin'
     }
   });
