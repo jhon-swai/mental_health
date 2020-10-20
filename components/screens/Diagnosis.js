@@ -1,6 +1,5 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { render } from 'react-dom';
 import { View, StyleSheet , Text, Dimensions} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button, Title, Snackbar } from 'react-native-paper';
@@ -31,7 +30,8 @@ const questions_code =
     "suicidal_thoughts"]
 
 const answer_options = ['not at all', 'every day', 'more than half of the days', 'nearly everyday']
-export default function Diagnosis(){
+
+export default function Diagnosis({navigation}){
 
     const [reply, setReply] = useState(
         {"little_interest": 0,
@@ -44,26 +44,41 @@ export default function Diagnosis(){
         "sluggish": 0,
         "suicidal_thoughts": 0}
     )
-    
+ 
+    const [visible, setVisible] = useState(false)
+
+    const showSnackbar = () => setVisible(true)
+    const onDismissSnackbar = () => setVisible(false)
+
     // track the number of questions answered 
     const [count, setCount] = useState(0)
 
     const increment = () => { setCount(count + 1) }
     
     const setValue = (qn_code, value) =>{
+        increment()
         setReply({ ...reply, [questions_code[qn_code]]: value})
-        increment
+        
         console.log(reply)
     }
 
+    const diagnosisResult = "Positive"
+
     const submitData = () => {
+        // check the number of questions answered before submitting the form
         if (count > 7) {
-            axios.post(apiUrl,data= reply)
+            axios.post(apiUrl,{reply})
             .then(function(response){ console.log(response) })
             .catch(function(error){ console.log(error)})
+            
+            //then go to the results screen
+            navigation.navigate('Results', {diagnosisResult: diagnosisResult})
+
         }
         else { 
             
+            // show snackbar 
+            showSnackbar()
         }
     }
 
@@ -165,7 +180,20 @@ export default function Diagnosis(){
         </View>
         
         
+        
         <Button mode='contained' onPress={submitData}> Submit</Button>
+
+        <Snackbar
+            visible = {visible}
+            onDismiss = {onDismissSnackbar}
+            actions={{
+                label: 'close',
+                onPress: () => { onDismissSnackbar }
+            }}
+            duration='3000'
+        >
+            <Text>Please finish the form</Text>
+        </Snackbar>
         </ScrollView>
         
     )
@@ -191,7 +219,7 @@ const styles = StyleSheet.create({
     },
     questionsContainer:{
         alignItems: "flex-start",
-        color: '#292a30',
+        color: '#fff',
     },
     button: {
         marginLeft: 10,
