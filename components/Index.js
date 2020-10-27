@@ -1,31 +1,44 @@
 import 'react-native-gesture-handler';
-import React from 'react'
+import React, { useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack'
+import ResponseProvider from './navigation/ResponseProvider';
+
+
+import { createDrawerNavigator, DrawerContentScrollView,  } from '@react-navigation/drawer';
+
 
 import Diagnosis from './screens/Diagnosis'
 import Results from './screens/Results'
+import Treatment from './screens/Treatment'
 
-const Stack = createStackNavigator()
+
+
+const Drawer = createDrawerNavigator()
 
 export default function Index(){
+    const [results, setResults ] = useState()
     return (
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen
-                    name="Diagnosis"
-                    component={Diagnosis}
-                />
-
-                <Stack.Screen
-                    name="Results"
-                    component={Results}
-                />
-                    
-                
-            </Stack.Navigator>
-            
-        </NavigationContainer>
         
+            <NavigationContainer>
+
+                    <Drawer.Navigator>
+                    {/*TODO: it is possible to insert the navigation here. Look into that!!*/}
+                    <Drawer.Screen
+                        name="Diagnosis"
+                        component={Diagnosis}
+                    />
+
+                    <Drawer.Screen
+                        name="Results"
+                        component={Results}
+                    />
+                    <Drawer.Screen
+                        name="Treatment"
+                        component={Treatment}
+                    /> 
+                </Drawer.Navigator>
+                
+            </NavigationContainer>
+          
     )
 }

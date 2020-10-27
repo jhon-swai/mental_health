@@ -3,9 +3,9 @@ import React, { useState } from 'react'
 import { View, StyleSheet , Text, Dimensions} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button, Title, Snackbar } from 'react-native-paper';
+import styles from '../shared/styles/style'
 
-const apiUrl = 'http://example.com'
-const { width, height } = Dimensions.get('screen')
+const apiUrl =  'https://mental-health-status.herokuapp.com/diagnose'
 
 const questions = [
     'do you have little interest in doing things?', 
@@ -18,31 +18,46 @@ const questions = [
     ' are you moving or speaking so slowly that other people could have noticed? Or so fidgety or restless that you have been moving a lot more than usual?', 
     'Thoughts that you would be better off dead, or thoughts of hurting yourself in some way?']
 
-const questions_code = 
-    ["little_interest",
-    "down_depressed",
-    "sleep_trouble",
-    "feeling_tired",
-    "appetite",
-    "self_pity",
-    "poor_concentration",
-    "sluggish",
-    "suicidal_thoughts"]
+// const questions_code_actual = 
+//     ["little_interest",
+//     "down_depressed",
+//     "sleep_trouble",
+//     "feeling_tired",
+//     "appetite",
+//     "self_pity",
+//     "poor_concentration",
+//     "sluggish",
+//     "suicidal_thoughts"]
+const questions_code = [
+    'q1','q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9'
+]
 
 const answer_options = ['not at all', 'every day', 'more than half of the days', 'nearly everyday']
 
 export default function Diagnosis({navigation}){
 
+    // const [reply, setReply] = useState(
+    //     {"little_interest": 0,
+    //     "down_depressed": 0,
+    //     "sleep_trouble": 0,
+    //     "feeling_tired": 0,
+    //     "appetite": 0,
+    //     "self_pity": 0,
+    //     "poor_concentration": 0,
+    //     "sluggish": 0,
+    //     "suicidal_thoughts": 0}
+    // )
     const [reply, setReply] = useState(
-        {"little_interest": 0,
-        "down_depressed": 0,
-        "sleep_trouble": 0,
-        "feeling_tired": 0,
-        "appetite": 0,
-        "self_pity": 0,
-        "poor_concentration": 0,
-        "sluggish": 0,
-        "suicidal_thoughts": 0}
+        {
+        "q1": 0,
+        "q2": 0,
+        "q3": 0,
+        "q4": 0,
+        "q5": 0,
+        "q6": 0,
+        "q7": 0,
+        "q8": 0,
+        "q9": 0}
     )
  
     const [visible, setVisible] = useState(false)
@@ -62,179 +77,176 @@ export default function Diagnosis({navigation}){
         console.log(reply)
     }
 
-    const diagnosisResult = "Positive"
+    const [results, setResults] = useState("Neutral")
 
     const submitData = () => {
+        //TODO:try using axios
         // check the number of questions answered before submitting the form
-        if (count > 7) {
-            axios.post(apiUrl,{reply})
-            .then(function(response){ console.log(response) })
-            .catch(function(error){ console.log(error)})
+        // if (count > 7) {
+        //     axios.post(apiUrl,{reply})
+        //     .then(
+        //         // axios.get(apiUrl,{reply}).then(function(response){ console.log(response); setResults(response) })
+        //         (response) => { console.log(response); setResults(response) }
+        //     )
+        //     .catch((error)=>{ console.log(error)})
             
-            //then go to the results screen
-            navigation.navigate('Results', {diagnosisResult: diagnosisResult})
+            
+      //     //then go to the results screen
+        //     navigation.navigate('Results', {diagnosisResult: results})
 
+        // }
+        if (count > 5){
+                                
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: new Headers(
+                    {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',                          
+                    }),
+                    body: JSON.stringify( reply )
+                }
+            )        
+            .then( (response)=>{
+                console.log(response.body);  
+                navigation.navigate('Results', {diagnosisResult: results}    )
+            } )
+            .catch( 
+                (error)=>{ console.log("The app failed"); 
+                console.log(error) 
+            })
+            .finally( console.log("done") )     
         }
         else { 
             
-            // show snackbar 
+            // show snackbar when the questions answered are fewer than expected
             showSnackbar()
         }
     }
 
     return (
-        <ScrollView>
-        <View style={styles.container}>
-            <Title style={styles.titleText}>PHQ-9 Diagnostic Test</Title>
-
-            {/*little interest*/  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[0]}</Text>
-                    
-                    <Button mode='text' onPress={ () => setValue(0,1) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(0,1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(0,2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(0,3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*depressed */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[1]}</Text>
-                    
-                    <Button mode='text' onPress={ () =>setValue(1,0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () =>setValue(1,1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () =>setValue(1,2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () =>setValue(1,3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*Sleep trouble */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[2]}</Text>
-    
-                    <Button mode='text' onPress={ () => setValue(2,0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(2,1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(2,2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(2,3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*feeling tired  */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[3]}</Text>
-    
-                    <Button mode='text' onPress={ () => setValue(3, 0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(3, 1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(3, 2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(3, 3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*Appetite */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[4]}</Text>
-    
-                    <Button mode='text' onPress={ () => setValue(4, 0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(4, 1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(4, 2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(4, 3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*self pity */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[5]}</Text>
-    
-                    <Button mode='text' onPress={ () => setValue(5, 0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(5, 1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(5, 2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(5, 3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*poor concentration */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[6]}</Text>
-    
-                    <Button mode='text' onPress={ () => setValue(6, 0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(6, 1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(6, 2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(6, 3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*sluggish  */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[7]}</Text>
-    
-                    <Button mode='text' onPress={ () => setValue(7, 0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(7, 1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(7, 2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(7, 3) } >d) {answer_options[3]}</Button>
-            </View>
-
-            {/*suicidal thoughts  */  }
-            <View style={styles.questionsContainer}>
-                <Text style={styles.questions}>How often {questions[8]}</Text>
-    
-                    <Button mode='text' onPress={ () => setValue(8, 0) }>a) {answer_options[0]}</Button>
-                    <Button mode='text' onPress={ () => setValue(8, 1) } >b) {answer_options[1]}</Button>
-                    <Button mode='text' onPress={ () => setValue(8, 2) }>c) {answer_options[2]}</Button>
-                    <Button mode='text' onPress={ () => setValue(8, 3) } >d) {answer_options[3]}</Button>
-            </View> 
-                       
-        </View>
         
-        
-        
-        <Button mode='contained' onPress={submitData}> Submit</Button>
+            <ScrollView>
+            
+            
+            <View style={styles.container}>
+                
+            <Title style={styles.navPane}>
+                <Button icon='menu' mode='text'  onPress={ ()=> navigation.toggleDrawer()  }></Button>
+                <Text>PHQ-9 Diagnostic Test </Text>
+            </Title>
 
-        <Snackbar
-            visible = {visible}
-            onDismiss = {onDismissSnackbar}
-            actions={{
-                label: 'close',
-                onPress: () => { onDismissSnackbar }
-            }}
-            duration='3000'
-        >
-            <Text>Please finish the form</Text>
-        </Snackbar>
-        </ScrollView>
+                {/*little interest*/  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[0]}</Text>
+                        
+                        <Button mode='text' onPress={ () => setValue(0,1) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(0,1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(0,2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(0,3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*depressed */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[1]}</Text>
+                        
+                        <Button mode='text' onPress={ () =>setValue(1,0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () =>setValue(1,1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () =>setValue(1,2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () =>setValue(1,3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*Sleep trouble */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[2]}</Text>
+        
+                        <Button mode='text' onPress={ () => setValue(2,0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(2,1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(2,2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(2,3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*feeling tired  */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[3]}</Text>
+        
+                        <Button mode='text' onPress={ () => setValue(3, 0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(3, 1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(3, 2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(3, 3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*Appetite */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[4]}</Text>
+        
+                        <Button mode='text' onPress={ () => setValue(4, 0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(4, 1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(4, 2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(4, 3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*self pity */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[5]}</Text>
+        
+                        <Button mode='text' onPress={ () => setValue(5, 0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(5, 1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(5, 2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(5, 3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*poor concentration */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[6]}</Text>
+        
+                        <Button mode='text' onPress={ () => setValue(6, 0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(6, 1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(6, 2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(6, 3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*sluggish  */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[7]}</Text>
+        
+                        <Button mode='text' onPress={ () => setValue(7, 0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(7, 1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(7, 2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(7, 3) } >d) {answer_options[3]}</Button>
+                </View>
+
+                {/*suicidal thoughts  */  }
+                <View style={styles.questionsContainer}>
+                    <Text style={styles.questions}>How often {questions[8]}</Text>
+        
+                        <Button mode='text' onPress={ () => setValue(8, 0) }>a) {answer_options[0]}</Button>
+                        <Button mode='text' onPress={ () => setValue(8, 1) } >b) {answer_options[1]}</Button>
+                        <Button mode='text' onPress={ () => setValue(8, 2) }>c) {answer_options[2]}</Button>
+                        <Button mode='text' onPress={ () => setValue(8, 3) } >d) {answer_options[3]}</Button>
+                </View> 
+                        
+            </View>
+            
+            
+            
+            <Button mode='contained' onPress={ submitData }> Submit </Button>
+
+            <Snackbar
+                visible = {visible}
+                onDismiss = {onDismissSnackbar}
+                actions={{
+                    label: 'close',
+                    onPress: () => { onDismissSnackbar }
+                }}
+                duration='300'
+            >
+                <Text>Please finish the form</Text>
+            </Snackbar>
+            </ScrollView>
+      
+        
         
     )
     
 }
-
-const styles = StyleSheet.create({
-    container: {
-      backgroundColor: '#f5f5f5',
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: "ccc",
-      marginLeft: 10,
-      marginRight: 10,
-      color: '#292a30',
-    },
-    
-    titleText: {
-        marginBottom: 15,
-        alignContent: 'center',
-        alignItems: 'center',
-    },
-    questionsContainer:{
-        alignItems: "flex-start",
-        color: '#fff',
-    },
-    button: {
-        marginLeft: 10,
-        marginRight: 10,
-        fontSize: 22
-    },
-    buttonContainer: {
-        width: width / 20,
-        height: height / 25,
-        backgroundColor: '#ccc',
-        
-    },
-    questions: {
-        fontSize: 22,
-        marginBottom: 10 ,
-        fontFamily: 'Cochin'
-    }
-  });
