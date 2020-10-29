@@ -47,7 +47,7 @@ export default function Diagnosis({navigation}){
     //     "sluggish": 0,
     //     "suicidal_thoughts": 0}
     // )
-    const [reply, setReply] = useState(
+    const [reply, setReply] = useState(   
         {
         "q1": 0,
         "q2": 0,
@@ -77,7 +77,13 @@ export default function Diagnosis({navigation}){
         console.log(reply)
     }
 
-    const [results, setResults] = useState("Neutral")
+    let depression_scale = ["no depression", "mild depression", "moderate depression", "moderately severe depression", "severe depression"]
+
+    const [results, setResults] = useState("waiting...")
+    const submitReply = (status) =>{
+        setResults(depression_scale[status])
+    }
+
 
     const submitData = () => {
         //TODO:try using axios
@@ -104,13 +110,14 @@ export default function Diagnosis({navigation}){
                         Accept: 'application/json',
                         'Content-Type': 'application/json',                          
                     }),
-                    body: JSON.stringify( reply )
+                body: JSON.stringify( reply )
                 }
             )        
-            .then( (response)=>{
-                console.log(response.body);  
-                navigation.navigate('Results', {diagnosisResult: results}    )
-            } )
+            .then( (response)=> response.json() )
+            .then( (json) => { 
+                 submitReply( json.status )
+                 navigation.navigate('Results', {diagnosisResult: results}    )      
+            })
             .catch( 
                 (error)=>{ console.log("The app failed"); 
                 console.log(error) 

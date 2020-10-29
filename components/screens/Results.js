@@ -5,8 +5,8 @@ import styles from '../shared/styles/style'
 
 export default function Results({route,navigation}){
     //TODO:allow the route to take this parameter from the context
-    const res = route.params.diagnosisResult
-    
+    const [res, setRes] = React.useState(route.params.diagnosisResult)
+             
     return (
         <View>
             <Title style={styles.navPane}>
