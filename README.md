@@ -29,9 +29,16 @@ There is currently three main components/screens
 
 ## Functionality of each component
 The above screens each play different roles 
+
 ### Diagnostic screen 
 It is used for performing screening and diagnosis of the the patient 
 ### Result screen 
 After the patient has been diagnosed the results are displayed on the this screen
 ### Treatment screen
 This is where we administer the treatment and perform CBT training
+
+## Version
+This is app is still underdevelopment and is currently in version ```1.0.0```
+
+## Contribution 
+Please feel free to send a PR or file an issue
